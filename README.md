@@ -1,3 +1,4 @@
+<H1>Similarity</H1>
 <ul>
 <li> Indexing speed optimization, Now indexes about 50 images per second (CPU only) on a Qualcomm Snapdragon 8 Gen 2. equivilant to 3000 images per minute.</li>
 <li> Added image-to-image similarity threshold control slider.</li>
@@ -23,6 +24,8 @@
 <li> Added manual metadata scan</li>
 <li> Added settings for Show similarity slider, CPU micro-batch size, use size filtering</li>
 </ul>
+
+<p>Thanks and Credit to https://github.com/slavabarkov for the original Tidy code</p>
 
 <p><b>Disclaimer 1</b>: I am not a java developer and can't even understand most of the code in this repository, and also very new to git, I just want to put this here if it's useful to anyone.</p>
 
