@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".fragments.SearchFragment"
+        >
+
+    <LinearLayout
+        android:id="@+id/resultsHeaderRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/similarity_screen_h_margin"
+        android:layout_marginEnd="@dimen/similarity_screen_h_margin"
+        android:layout_marginTop="@dimen/similarity_section_title_margin_top"
+        android:layout_marginBottom="@dimen/similarity_section_block_margin_bottom"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/resultsTitleText"
+            style="@style/Similarity.SectionTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:text="All images" />
+
+        <TextView
+            android:id="@+id/resultsCountText"
+            style="@style/Similarity.SectionCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="0" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+	        <LinearLayout
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_marginBottom="@dimen/similarity_space_sm"
+	            android:paddingStart="@dimen/similarity_screen_h_margin"
+	            android:paddingEnd="@dimen/similarity_screen_h_margin"
+	            android:clipChildren="false"
+	            android:clipToPadding="false"
+	            android:gravity="center_vertical"
+	            android:orientation="horizontal">
+
+		        <com.google.android.material.card.MaterialCardView
+		            android:id="@+id/searchBarCard"
+		            android:layout_width="0dp"
+		            android:layout_height="48dp"
+		            android:layout_weight="1"
+		            app:cardCornerRadius="24dp"
+		            app:cardElevation="0dp"
+		            app:strokeWidth="0dp"
+		            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+		            <androidx.constraintlayout.widget.ConstraintLayout
+		                android:layout_width="match_parent"
+		                android:layout_height="match_parent"
+		                android:paddingStart="4dp"
+		                android:paddingEnd="4dp">
+
+		                <ImageButton
+		                    android:id="@+id/searchBackButton"
+		                    android:layout_width="40dp"
+		                    android:layout_height="40dp"
+		                    android:background="@drawable/bg_circle_ripple"
+		                    android:contentDescription="Back"
+		                    android:padding="8dp"
+		                    android:scaleType="center"
+		                    android:src="@drawable/ic_arrow_back"
+		                    app:tint="?attr/colorOnSurface"
+		                    android:visibility="gone"
+		                    app:layout_constraintBottom_toBottomOf="parent"
+		                    app:layout_constraintStart_toStartOf="parent"
+		                    app:layout_constraintTop_toTopOf="parent" />
+
+		                <HorizontalScrollView
+		                    android:id="@+id/searchInputScroll"
+		                    android:layout_width="0dp"
+		                    android:layout_height="match_parent"
+		                    android:fillViewport="true"
+		                    android:overScrollMode="never"
+		                    android:scrollbars="none"
+		                    app:layout_constraintBottom_toBottomOf="parent"
+		                    app:layout_constraintEnd_toStartOf="@id/searchSubmitButton"
+		                    app:layout_constraintStart_toEndOf="@id/searchBackButton"
+		                    app:layout_constraintTop_toTopOf="parent">
+
+			                    <LinearLayout
+			                        android:id="@+id/searchInputRow"
+			                        android:layout_width="wrap_content"
+			                        android:layout_height="match_parent"
+			                        android:gravity="center_vertical"
+			                        android:orientation="horizontal"
+			                        android:paddingStart="@dimen/similarity_text_field_inner_padding_start"
+			                        android:paddingEnd="@dimen/similarity_text_field_inner_padding_start">
+
+		                        <com.google.android.material.chip.ChipGroup
+		                            android:id="@+id/searchChips"
+		                            android:layout_width="wrap_content"
+		                            android:layout_height="wrap_content"
+		                            android:layout_marginEnd="6dp"
+		                            android:visibility="gone"
+		                            app:chipSpacingHorizontal="6dp"
+		                            app:singleLine="true" />
+
+		                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+		                            android:id="@+id/searchText"
+		                            android:layout_width="0dp"
+		                            android:layout_height="40dp"
+		                            android:layout_weight="1"
+		                            android:background="@null"
+		                            android:gravity="center_vertical"
+		                            android:hint="@string/search_hint_example"
+		                            android:imeOptions="actionSearch"
+		                            android:inputType="textWebEditText|text"
+		                            android:paddingStart="0dp"
+		                            android:paddingEnd="0dp"
+		                            android:singleLine="true"
+		                            android:completionThreshold="2" />
+		                    </LinearLayout>
+		                </HorizontalScrollView>
+
+		                <ImageButton
+		                    android:id="@+id/searchSubmitButton"
+		                    android:layout_width="40dp"
+		                    android:layout_height="40dp"
+		                    android:background="@drawable/bg_circle_ripple"
+		                    android:contentDescription="Search"
+		                    android:padding="8dp"
+		                    android:scaleType="center"
+		                    android:src="@drawable/ic_search"
+		                    app:tint="?attr/colorOnSurface"
+		                    app:layout_constraintBottom_toBottomOf="parent"
+		                    app:layout_constraintEnd_toEndOf="parent"
+		                    app:layout_constraintTop_toTopOf="parent" />
+		            </androidx.constraintlayout.widget.ConstraintLayout>
+		        </com.google.android.material.card.MaterialCardView>
+
+	        <Space
+	            android:layout_width="@dimen/similarity_space_sm"
+	            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/indexFoldersButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Tools"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:text=""
+            android:src="@drawable/ic_more_vert"
+            app:tint="?attr/colorOnSurface" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/topButtonsRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal|center_vertical">
+
+            <!-- Count moved above the search field -->
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/imageSimilaritySection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/similarity_space_sm"
+        android:orientation="vertical">
+
+	        <LinearLayout
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:gravity="center_vertical"
+	            android:orientation="horizontal"
+	            android:paddingStart="@dimen/similarity_space_sm"
+	            android:paddingEnd="@dimen/similarity_space_sm">
+
+            <TextView
+                android:id="@+id/imageSimilarityLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Image search similarity threshold" />
+
+            <TextView
+                android:id="@+id/imageSimilarityValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.80" />
+        </LinearLayout>
+
+	        <SeekBar
+	            android:id="@+id/imageSimilaritySeekBar"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:paddingTop="20dp"
+	            android:paddingBottom="40dp"
+	            android:max="100" />
+    </LinearLayout>
+
+	    <LinearLayout
+	        android:id="@+id/reindexProgressContainer"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical"
+	        android:paddingStart="@dimen/similarity_space_md"
+	        android:paddingEnd="@dimen/similarity_space_md"
+	        android:paddingTop="@dimen/similarity_space_xs"
+	        android:paddingBottom="@dimen/similarity_space_xs"
+	        android:visibility="gone">
+
+	        <TextView
+	            android:id="@+id/reindexProgressText"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:gravity="center"
+	            android:text="Updating index: 0% • 0" />
+
+	        <LinearLayout
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:gravity="center_vertical"
+	            android:orientation="horizontal">
+
+	            <ProgressBar
+	                android:id="@+id/reindexProgressBar"
+	                style="?android:attr/progressBarStyleHorizontal"
+	                android:layout_width="0dp"
+	                android:layout_height="10dp"
+	                android:layout_weight="1"
+	                android:progress="0" />
+
+		            <Space
+		                android:layout_width="@dimen/similarity_space_md"
+		                android:layout_height="wrap_content" />
+
+	            <ImageButton
+	                android:id="@+id/clearButton"
+	                android:layout_width="48dp"
+	                android:layout_height="48dp"
+	                android:background="@drawable/bg_circle_ripple"
+	                android:contentDescription="Pause indexing"
+	                android:padding="12dp"
+	                android:scaleType="center"
+	                android:src="@drawable/ic_pause"
+	                app:tint="?attr/colorOnSurface"
+	                android:visibility="gone" />
+	        </LinearLayout>
+
+        <TextView
+            android:id="@+id/reindexCountText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Indexed photos: 0"
+            android:visibility="gone" />
+    </LinearLayout>
+
+	    <LinearLayout
+	        android:id="@+id/selectionActions"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="center_vertical"
+	        android:orientation="horizontal"
+	        android:paddingStart="@dimen/similarity_space_sm"
+	        android:paddingEnd="@dimen/similarity_space_sm"
+	        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/selectedCountText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Selected: 0" />
+
+        <ImageButton
+            android:id="@+id/moveSelectedButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Move selected"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_move"
+            app:tint="?attr/colorOnSurface" />
+
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/copySelectedButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Copy selected"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_copy"
+            app:tint="?attr/colorOnSurface" />
+
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/shareSelectedButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Share selected"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_share"
+            app:tint="?attr/colorOnSurface" />
+
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/deleteSelectedButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Delete selected"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_delete"
+            app:tint="?attr/colorOnSurface" />
+
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/clearSelectionButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Clear selection"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_clear"
+            app:tint="?attr/colorOnSurface" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        app:layoutManager="GridLayoutManager"
+        app:spanCount="3" />
+
+
+</LinearLayout>

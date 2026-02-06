@@ -1,0 +1,6 @@
+[submodule "third_party/libjpeg-turbo"]
+	path = third_party/libjpeg-turbo
+	url = https://github.com/libjpeg-turbo/libjpeg-turbo.git
+[submodule "third_party/sentencepiece"]
+	path = third_party/sentencepiece
+	url = https://github.com/google/sentencepiece.git

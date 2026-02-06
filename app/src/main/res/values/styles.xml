@@ -1,0 +1,35 @@
+<resources>
+    <style name="Similarity" />
+
+    <style name="Similarity.SectionTitle" parent="Similarity">
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="Similarity.SectionCount" parent="Similarity">
+        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:alpha">0.8</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="ThemeOverlay.SIMILARITY.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Similarity.DialogActionButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Similarity.DialogActionButton</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.Similarity.DialogActionButton</item>
+    </style>
+
+    <style name="Widget.Similarity.DialogActionButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="Widget.Similarity.ToolsDialogButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="iconTint">?attr/colorOnSurface</item>
+        <item name="strokeColor">?attr/colorOnSurface</item>
+    </style>
+
+    <!-- (legacy button styles removed) -->
+</resources>

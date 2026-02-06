@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".fragments.ImageFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end|center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/editToolbarRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:gravity="end|center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp">
+
+            <LinearLayout
+                android:id="@+id/editActionsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageButton
+                    android:id="@+id/buttonRotateCcw"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_circle_ripple"
+                    android:contentDescription="@string/edit_rotate_ccw"
+                    android:padding="12dp"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_rotate_left"
+                    app:tint="@color/similarity_icon_tint" />
+
+                <ImageButton
+                    android:id="@+id/buttonRotate"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/bg_circle_ripple"
+                    android:contentDescription="@string/edit_rotate"
+                    android:padding="12dp"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_rotate_right"
+                    app:tint="@color/similarity_icon_tint" />
+
+                <Space
+                    android:layout_width="6dp"
+                    android:layout_height="1dp" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/buttonEdit"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_circle_ripple"
+                android:contentDescription="@string/edit"
+                android:padding="12dp"
+                android:scaleType="center"
+                android:src="@drawable/ic_edit"
+                app:tint="@color/similarity_icon_tint" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/singeImageView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="73"
+        android:background="@color/image_view_bg"
+        tools:src="@tools:sample/avatars" />
+
+    <ScrollView
+        android:id="@+id/imageInfoScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:fillViewport="true"
+        android:overScrollMode="ifContentScrolls"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="1px"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/imageInfoTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|top"
+                android:text="Location: …\nSize: …\nDimensions: …"
+                android:textColor="?attr/colorOnSurface"
+                android:alpha="0.7"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/aiTagsTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="start|top"
+                android:text="@string/ai_tags_loading"
+                android:textColor="?attr/colorOnSurface"
+                android:alpha="0.8"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <GridLayout
+                android:id="@+id/imageExifGrid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1px"
+                android:columnCount="2"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/xmpTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1px"
+                android:ellipsize="end"
+                android:gravity="start|top"
+                android:maxLines="4"
+                android:text="Metadata: …"
+                android:textColor="?attr/colorOnSurface"
+                android:alpha="0.7"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingTop="7dp">
+
+        <ImageButton
+            android:id="@+id/buttonBackToAllImages"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Back"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/similarity_icon_tint" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/buttonExif"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Info"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_info"
+            app:tint="@color/similarity_icon_tint" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/buttonAiTags"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="@string/ai_tags"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_help"
+            app:tint="@color/similarity_icon_tint" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/buttonImage2Image"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Find similar"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_search"
+            app:tint="@color/similarity_icon_tint" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/buttonShare"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Share"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_share"
+            app:tint="@color/similarity_icon_tint" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/buttonDelete"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_ripple"
+            android:contentDescription="Delete"
+            android:padding="12dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/similarity_icon_tint" />
+
+    </LinearLayout>
+
+</LinearLayout>

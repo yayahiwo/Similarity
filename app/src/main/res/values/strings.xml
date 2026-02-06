@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Similarity</string>
+    <string name="search_hint_example">Search</string>
+    <string name="ai_tags">AI tags</string>
+    <string name="ai_tags_loading">Computing AI tags…</string>
+    <string name="ai_tags_unavailable">AI tags unavailable (image not indexed)</string>
+    <string name="ai_tags_none_above_threshold">No AI tags above threshold; showing best matches</string>
+    <string name="edit">Edit</string>
+    <string name="edit_crop">Crop</string>
+    <string name="edit_rotate">Rotate</string>
+    <string name="edit_resize">Resize</string>
+    <string name="edit_apply">Apply</string>
+    <string name="edit_cancel">Cancel</string>
+    <string name="edit_confirm_title">Confirm edit</string>
+    <string name="edit_reencode_warning">Note: current edits re-encode the image (lossless JPEG rotate/crop will be added later).</string>
+    <string name="edit_saved">Saved</string>
+    <string name="edit_rotate_jpeg_only">Lossless rotate is supported for JPEG images only.</string>
+    <string name="edit_rotate_missing_turbo">Lossless rotate requires libjpeg-turbo (JNI not available).</string>
+    <string name="edit_rotate_ccw">Rotate left</string>
+</resources>

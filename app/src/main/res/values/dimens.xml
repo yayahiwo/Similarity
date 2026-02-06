@@ -1,0 +1,15 @@
+<resources>
+    <!-- Spacing -->
+    <dimen name="similarity_space_xs">6dp</dimen>
+    <dimen name="similarity_space_sm">8dp</dimen>
+    <dimen name="similarity_space_md">12dp</dimen>
+
+    <!-- Common paddings/margins -->
+    <dimen name="similarity_screen_h_margin">12dp</dimen>
+    <dimen name="similarity_text_field_inner_padding_start">12dp</dimen>
+    <!-- Search input inset: ~half of the 40dp text field height -->
+    <dimen name="similarity_search_input_inset_start">20dp</dimen>
+    <dimen name="similarity_section_title_margin_top">8dp</dimen>
+    <dimen name="similarity_section_block_margin_bottom">10dp</dimen>
+    <dimen name="similarity_dialog_h_padding">24dp</dimen>
+</resources>
