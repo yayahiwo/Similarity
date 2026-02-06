@@ -81,17 +81,6 @@ object SimilaritySettings {
     const val KEY_INDEX_FOLDERS_CONFIGURED = "index_folders_configured"
     const val KEY_SELECT_FOLDER_HINT_SHOWN = "select_folder_hint_shown"
 
-    // If available in the build, use Qualcomm QNN EP (Hexagon/HTP) for visual embedding inference.
-    // Falls back to CPU if QNN isn't available or fails to initialize.
-    const val KEY_INDEX_USE_QNN = "index_use_qnn"
-    // If QNN can't compile the bundled INT8 vision model (e.g., ConvInteger not implemented), skip
-    // trying it on subsequent runs and use the float/FP16 model instead.
-    const val KEY_QNN_SKIP_INT8_VISION_MODEL = "qnn_skip_int8_vision_model"
-
-    // If available in the build, use Android NNAPI EP (may use GPU/NPU) for visual embedding inference.
-    // Falls back to CPU if NNAPI isn't available or fails to initialize.
-    const val KEY_INDEX_USE_NNAPI = "index_use_nnapi"
-
     // Tracks which embedding engine produced the on-device image embedding database, so we can
     // wipe/reindex when changing models.
     const val KEY_IMAGE_EMBEDDING_ENGINE_ID = "image_embedding_engine_id"

@@ -137,7 +137,7 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
                 val sess = ortEnv.createSession(models.visionModelFile.absolutePath, opts)
                 cpuSession = sess
                 cpuOutputName = selectEmbeddingOutputName(sess)
-                cpuBatchCap = selectBatchCap(sess, VisualExecution.CPU)
+                cpuBatchCap = selectBatchCap(sess)
                 val (w, h) = selectInputDims(sess)
                 cpuInputWidth = w
                 cpuInputHeight = h
@@ -147,23 +147,6 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
             }
         }
     }
-
-    @Volatile private var qnnSession: OrtSession? = null
-    @Volatile private var qnnAttempted: Boolean = false
-    @Volatile private var qnnSupportedCached: Boolean? = null
-    @Volatile private var qnnOutputName: String? = null
-    @Volatile private var qnnBatchCap: Int? = null
-    @Volatile private var qnnInputWidth: Int? = null
-    @Volatile private var qnnInputHeight: Int? = null
-    @Volatile private var qnnModelRawName: String? = null
-
-    @Volatile private var nnapiSession: OrtSession? = null
-    @Volatile private var nnapiAttempted: Boolean = false
-    @Volatile private var nnapiSupportedCached: Boolean? = null
-    @Volatile private var nnapiOutputName: String? = null
-    @Volatile private var nnapiBatchCap: Int? = null
-    @Volatile private var nnapiInputWidth: Int? = null
-    @Volatile private var nnapiInputHeight: Int? = null
 
     var idxList: ArrayList<Long> = arrayListOf()
     var embeddingsList: ArrayList<FloatArray> = arrayListOf()
@@ -183,18 +166,6 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
         private const val INDEXED_COUNT_UPDATE_MIN_INTERVAL_MS = 200L
         private const val INDEXED_COUNT_UPDATE_MIN_DELTA = 25
     }
-
-    private enum class VisualExecution {
-        CPU,
-        QNN,
-        NNAPI,
-    }
-
-    private data class SessionSelection(
-        val effective: VisualExecution,
-        val note: String? = null,
-        val modelRawName: String,
-    )
 
     init {
         val imageEmbeddingDao = ImageEmbeddingDatabase.getDatabase(application).imageEmbeddingDao()
@@ -269,99 +240,6 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun isQnnSupported(): Boolean {
-        qnnSupportedCached?.let { return it }
-        val supported =
-            try {
-                val opts = OrtSession.SessionOptions()
-                try {
-                    val addQnn =
-                        opts.javaClass.methods.firstOrNull { m ->
-                            m.name == "addQnn" &&
-                                m.parameterTypes.size == 1 &&
-                                Map::class.java.isAssignableFrom(m.parameterTypes[0])
-                        } ?: return false
-
-                    // Some builds expose the Java API but do not ship the native QNN EP, in which case
-                    // addQnn() throws an OrtException immediately ("not supported in this build").
-                    runCatching {
-                        val qnnOptions = HashMap<String, String>()
-                        qnnOptions["backend_type"] = "htp"
-                        addQnn.invoke(opts, qnnOptions)
-                    }.onFailure { t ->
-                        val msg = (t.cause ?: t).message.orEmpty()
-                        if (msg.contains("not supported in this build", ignoreCase = true)) return false
-                        if (msg.contains("QNN execution provider is not supported", ignoreCase = true)) return false
-                        // Unknown failure: treat as not supported to avoid misleading UI.
-                        return false
-                    }
-                    true
-                } finally {
-                    try {
-                        opts.close()
-                    } catch (_: Exception) {
-                    }
-                }
-            } catch (_: Throwable) {
-                false
-            }
-        qnnSupportedCached = supported
-        return supported
-    }
-
-        private fun isQnnEnabledByUser(): Boolean {
-            val prefs = SimilaritySettings.prefs(getApplication())
-            return prefs.getBoolean(SimilaritySettings.KEY_INDEX_USE_QNN, false)
-        }
-
-        private fun isNnapiEnabledByUser(): Boolean {
-            val prefs = SimilaritySettings.prefs(getApplication())
-            return prefs.getBoolean(SimilaritySettings.KEY_INDEX_USE_NNAPI, false)
-        }
-
-            @Synchronized
-            private fun getOrCreateQnnSessionOrNull(): OrtSession? {
-                if (qnnAttempted) return qnnSession
-                qnnAttempted = true
-
-                // We intentionally use reflection so the app continues to work with the default
-                // onnxruntime-android artifact. If built with onnxruntime-android-qnn, SessionOptions
-                // exposes addQnn(Map<String,String>) and this will create a QNN session.
-            return try {
-                val opts = OrtSession.SessionOptions()
-                val addQnn = opts.javaClass.methods.firstOrNull { m ->
-                    m.name == "addQnn" &&
-                        m.parameterTypes.size == 1 &&
-                        Map::class.java.isAssignableFrom(m.parameterTypes[0])
-                } ?: run {
-                    opts.close()
-                    null
-                }
-
-                if (addQnn == null) return null
-
-                val qnnOptions = HashMap<String, String>()
-                qnnOptions["backend_type"] = "htp"
-                addQnn.invoke(opts, qnnOptions)
-
-                val models = clipModels()
-                val session = ortEnv.createSession(models.visionModelFile.absolutePath, opts)
-                opts.close()
-                qnnSession = session
-                qnnModelRawName = models.engineId
-                qnnOutputName = selectEmbeddingOutputName(session)
-                qnnBatchCap = selectBatchCap(session, VisualExecution.QNN)
-                val (w, h) = selectInputDims(session)
-                qnnInputWidth = w
-                qnnInputHeight = h
-                Log.i(LOG_TAG, "QNN session created (engine=${models.engineId})")
-                session
-            } catch (t: Throwable) {
-                Log.w(LOG_TAG, "QNN session unavailable; using CPU", t)
-                null
-            }
-        }
-
     private fun selectEmbeddingOutputName(session: OrtSession): String {
         val info = session.outputInfo
         if (info.isEmpty()) return session.outputNames.firstOrNull() ?: ""
@@ -390,7 +268,7 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
         return candidates.maxByOrNull { it.score }?.name ?: (session.outputNames.firstOrNull() ?: "")
     }
 
-    private fun selectBatchCap(session: OrtSession, effective: VisualExecution): Int {
+    private fun selectBatchCap(session: OrtSession): Int {
         val inputName =
             session.inputNames.firstOrNull { it.contains("pixel", ignoreCase = true) }
                 ?: session.inputNames.firstOrNull()
@@ -402,14 +280,8 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
         if (shape.isEmpty()) return 1
 
         // If batch dim is dynamic (-1/0), we can micro-batch.
-        //
-        // Keep accelerators conservative; they often only support batch=1 reliably.
         return if (shape[0] <= 0L) {
-            when (effective) {
-                VisualExecution.CPU -> MAX_MICRO_BATCH_HARD_CAP
-                VisualExecution.QNN -> 1
-                VisualExecution.NNAPI -> 1
-            }
+            MAX_MICRO_BATCH_HARD_CAP
         } else {
             1
         }
@@ -432,12 +304,8 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
         return w to h
     }
 
-    private fun getInputDims(sessionSelection: SessionSelection): Pair<Int, Int> {
-        return when (sessionSelection.effective) {
-            VisualExecution.CPU -> (cpuInputWidth ?: IMAGE_SIZE_X) to (cpuInputHeight ?: IMAGE_SIZE_Y)
-            VisualExecution.QNN -> (qnnInputWidth ?: IMAGE_SIZE_X) to (qnnInputHeight ?: IMAGE_SIZE_Y)
-            VisualExecution.NNAPI -> (nnapiInputWidth ?: IMAGE_SIZE_X) to (nnapiInputHeight ?: IMAGE_SIZE_Y)
-        }
+    private fun getInputDims(): Pair<Int, Int> {
+        return (cpuInputWidth ?: IMAGE_SIZE_X) to (cpuInputHeight ?: IMAGE_SIZE_Y)
     }
 
     private fun clampCpuMicroBatchForMemory(requested: Int, bytesPerImage: Long): Int {
@@ -472,105 +340,17 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
         return clampCpuMicroBatchForMemory(MAX_MICRO_BATCH_HARD_CAP, bytesPerImage)
     }
 
-        private fun getBatchCap(sessionSelection: SessionSelection): Int {
-            return when (sessionSelection.effective) {
-                VisualExecution.CPU -> cpuBatchCap ?: 1
-                VisualExecution.QNN -> qnnBatchCap ?: 1
-                VisualExecution.NNAPI -> nnapiBatchCap ?: 1
-            }
-        }
+    private fun getBatchCap(): Int {
+        return cpuBatchCap ?: 1
+    }
 
-        fun isNnapiSupported(): Boolean {
-            nnapiSupportedCached?.let { return it }
-            val supported =
-                try {
-                    val opts = OrtSession.SessionOptions()
-                    try {
-                        val addNnapi =
-                            opts.javaClass.methods.firstOrNull { m ->
-                                m.name == "addNnapi" &&
-                                    (m.parameterTypes.isEmpty() ||
-                                        (m.parameterTypes.size == 1 && Map::class.java.isAssignableFrom(m.parameterTypes[0])))
-                            } ?: return false
+    private fun getOutputName(session: OrtSession): String {
+        return cpuOutputName ?: selectEmbeddingOutputName(session).also { cpuOutputName = it }
+    }
 
-                        runCatching {
-                            if (addNnapi.parameterTypes.isEmpty()) {
-                                addNnapi.invoke(opts)
-                            } else {
-                                addNnapi.invoke(opts, emptyMap<String, String>())
-                            }
-                        }.onFailure { t ->
-                            val msg = (t.cause ?: t).message.orEmpty()
-                            if (msg.contains("not supported in this build", ignoreCase = true)) return false
-                            // Unknown failure: treat as not supported to avoid misleading UI.
-                            return false
-                        }
-                        true
-                    } finally {
-                        try {
-                            opts.close()
-                        } catch (_: Exception) {
-                        }
-                    }
-                } catch (_: Throwable) {
-                    false
-                }
-            nnapiSupportedCached = supported
-            return supported
-        }
-
-        @Synchronized
-        private fun getOrCreateNnapiSessionOrNull(): OrtSession? {
-            if (nnapiAttempted) return nnapiSession
-            nnapiAttempted = true
-
-            // Use reflection so the app continues to work even if the NNAPI EP isn't present.
-            return try {
-                val opts = OrtSession.SessionOptions()
-                val addNnapi = opts.javaClass.methods.firstOrNull { m ->
-                    m.name == "addNnapi" &&
-                        (m.parameterTypes.isEmpty() ||
-                            (m.parameterTypes.size == 1 && Map::class.java.isAssignableFrom(m.parameterTypes[0])))
-                } ?: run {
-                    opts.close()
-                    null
-                }
-
-                if (addNnapi == null) return null
-
-                if (addNnapi.parameterTypes.isEmpty()) {
-                    addNnapi.invoke(opts)
-                } else {
-                    addNnapi.invoke(opts, emptyMap<String, String>())
-                }
-
-                val models = clipModels()
-                val session = ortEnv.createSession(models.visionModelFile.absolutePath, opts)
-                opts.close()
-                nnapiSession = session
-                nnapiOutputName = selectEmbeddingOutputName(session)
-                nnapiBatchCap = selectBatchCap(session, VisualExecution.NNAPI)
-                val (w, h) = selectInputDims(session)
-                nnapiInputWidth = w
-                nnapiInputHeight = h
-                Log.i(LOG_TAG, "NNAPI session created (engine=${models.engineId})")
-                session
-            } catch (t: Throwable) {
-                Log.w(LOG_TAG, "NNAPI session unavailable; using CPU", t)
-                null
-            }
-        }
-
-        private fun getOutputName(session: OrtSession, sessionSelection: SessionSelection): String {
-            return when (sessionSelection.effective) {
-                VisualExecution.QNN ->
-                    qnnOutputName ?: selectEmbeddingOutputName(session).also { qnnOutputName = it }
-                VisualExecution.NNAPI ->
-                    nnapiOutputName ?: selectEmbeddingOutputName(session).also { nnapiOutputName = it }
-                VisualExecution.CPU ->
-                    cpuOutputName ?: selectEmbeddingOutputName(session).also { cpuOutputName = it }
-            }
-        }
+    private fun selectSession(): OrtSession {
+        return getOrCreateCpuSession()
+    }
 
     private fun getOutputTensor(output: OrtSession.Result, outName: String): OnnxTensor {
         val v = if (outName.isNotBlank()) output.get(outName).orElse(null) else null
@@ -618,53 +398,6 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
         throw IllegalStateException("Unexpected output tensor rank=${shape.size} shape=${shape.contentToString()}")
     }
 
-    private fun selectSession(): Pair<OrtSession, SessionSelection> {
-        val models = clipModels()
-
-        if (isQnnEnabledByUser()) {
-            val qnn = getOrCreateQnnSessionOrNull()
-            if (qnn != null) {
-                return qnn to
-                    SessionSelection(
-                        effective = VisualExecution.QNN,
-                        modelRawName = qnnModelRawName ?: models.engineId,
-                    )
-            }
-            val note = if (isQnnSupported()) "qnn_init_failed" else "qnn_not_supported"
-            return getOrCreateCpuSession() to
-                SessionSelection(
-                    effective = VisualExecution.CPU,
-                    note = note,
-                    modelRawName = models.engineId,
-                )
-        }
-
-        if (isNnapiEnabledByUser()) {
-            val nnapi = getOrCreateNnapiSessionOrNull()
-            if (nnapi != null) {
-                return nnapi to
-                    SessionSelection(
-                        effective = VisualExecution.NNAPI,
-                        modelRawName = models.engineId,
-                    )
-            }
-            val note = if (isNnapiSupported()) "nnapi_init_failed" else "nnapi_not_supported"
-            return getOrCreateCpuSession() to
-                SessionSelection(
-                    effective = VisualExecution.CPU,
-                    note = note,
-                    modelRawName = models.engineId,
-                )
-        }
-
-        return getOrCreateCpuSession() to
-            SessionSelection(
-                effective = VisualExecution.CPU,
-                note = "accel_disabled",
-                modelRawName = models.engineId,
-            )
-    }
-
     fun generateIndex() {
         indexingJob?.cancel()
         indexingRunId += 1
@@ -688,7 +421,7 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
                 return@launch
             }
 
-            val (session, sessionSelection) =
+            val session =
                 try {
                     selectSession()
                 } catch (t: Throwable) {
@@ -700,10 +433,7 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
                     return@launch
                 }
 
-            Log.i(
-                LOG_TAG,
-                "Indexing session selected: ${sessionSelection.effective} model=${sessionSelection.modelRawName} note=${sessionSelection.note ?: "-"}"
-            )
+            Log.i(LOG_TAG, "Indexing session selected: CPU model=${models.engineId}")
 
             fun isLatest(): Boolean = indexingRunId == runId
             fun postIsIndexing(value: Boolean) {
@@ -767,7 +497,7 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
             val inputMap = HashMap<String, OnnxTensor>(1)
 
             val useClipMeanStd = models.visionUsesClipMeanStd
-            val (inputWidth, inputHeight) = getInputDims(sessionSelection)
+            val (inputWidth, inputHeight) = getInputDims()
             val stride = inputWidth * inputHeight
             val elemsPerImage = DIM_PIXEL_SIZE * stride
             val cpuMicroBatchPref =
@@ -775,19 +505,12 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
                     SimilaritySettings.KEY_CPU_MICRO_BATCH_MAX,
                     SimilaritySettings.DEFAULT_CPU_MICRO_BATCH_MAX
                 ).coerceIn(1, MAX_MICRO_BATCH_HARD_CAP)
-            val configuredBatchCap =
-                if (sessionSelection.effective == VisualExecution.CPU) cpuMicroBatchPref else 1
             val requestedMicroBatchMax =
-                minOf(getBatchCap(sessionSelection), configuredBatchCap, MAX_MICRO_BATCH_HARD_CAP)
+                minOf(getBatchCap(), cpuMicroBatchPref, MAX_MICRO_BATCH_HARD_CAP)
                     .coerceAtLeast(1)
             val microBatchBytesPerImage =
                 DIM_PIXEL_SIZE.toLong() * inputWidth.toLong() * inputHeight.toLong() * 4L
-            val microBatchMax =
-                if (sessionSelection.effective == VisualExecution.CPU) {
-                    clampCpuMicroBatchForMemory(requestedMicroBatchMax, microBatchBytesPerImage)
-                } else {
-                    requestedMicroBatchMax
-                }
+            val microBatchMax = clampCpuMicroBatchForMemory(requestedMicroBatchMax, microBatchBytesPerImage)
 
             val cpuResizeFilterEnabled =
                 prefs.getBoolean(
@@ -1084,7 +807,7 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
                                 inputMap[inputName] = t
                                 val output = session.run(inputMap)
                                 output.use { out ->
-                                    val outName = getOutputName(session, sessionSelection)
+                                    val outName = getOutputName(session)
                                     val outTensor = getOutputTensor(out, outName)
                                     val embeddings = extractEmbeddingsFromTensor(outTensor, batchSize)
 
@@ -1230,14 +953,8 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
 
     override fun onCleared() {
         super.onCleared()
-        try {
-            cpuSession?.close()
-        } catch (_: Exception) {
-        }
-        try {
-            qnnSession?.close()
-        } catch (_: Exception) {
-        }
+        runCatching { cpuSession?.close() }
+        cpuSession = null
     }
 
     fun clearIndexingError() {
@@ -1247,61 +964,9 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
     fun resetForFullReset() {
         // Stop in-progress indexing and drop all model/session caches so the next indexing run
         // reselects models and reinitializes ORT sessions.
-        try {
-                indexingJob?.cancel()
-            } catch (_: Exception) {
-            }
+        runCatching { indexingJob?.cancel() }
 
-            synchronized(clipModelsLock) { clipModelsCached = null }
-
-            try {
-                cpuSession?.close()
-            } catch (_: Exception) {
-            } finally {
-                cpuSession = null
-            }
-            cpuOutputName = null
-            cpuBatchCap = null
-            cpuInputWidth = null
-            cpuInputHeight = null
-
-            try {
-                qnnSession?.close()
-            } catch (_: Exception) {
-            } finally {
-                qnnSession = null
-            }
-            qnnAttempted = false
-            qnnSupportedCached = null
-            qnnOutputName = null
-            qnnBatchCap = null
-            qnnInputWidth = null
-            qnnInputHeight = null
-            qnnModelRawName = null
-
-            try {
-                nnapiSession?.close()
-            } catch (_: Exception) {
-            } finally {
-                nnapiSession = null
-            }
-            nnapiAttempted = false
-            nnapiSupportedCached = null
-            nnapiOutputName = null
-            nnapiBatchCap = null
-            nnapiInputWidth = null
-            nnapiInputHeight = null
-
-        idxList = arrayListOf()
-        embeddingsList = arrayListOf()
-    }
-
-    fun resetVisualSessionsForSettingsChange() {
-        // Close sessions so new SessionOptions (e.g., CPU threading) take effect.
-        try {
-            indexingJob?.cancel()
-        } catch (_: Exception) {
-        }
+        synchronized(clipModelsLock) { clipModelsCached = null }
 
         synchronized(cpuSessionLock) {
             runCatching { cpuSession?.close() }
@@ -1312,24 +977,22 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
         cpuInputWidth = null
         cpuInputHeight = null
 
-        runCatching { qnnSession?.close() }
-        qnnSession = null
-        qnnAttempted = false
-        qnnSupportedCached = null
-        qnnOutputName = null
-        qnnBatchCap = null
-        qnnInputWidth = null
-        qnnInputHeight = null
-        qnnModelRawName = null
+        idxList = arrayListOf()
+        embeddingsList = arrayListOf()
+    }
 
-        runCatching { nnapiSession?.close() }
-        nnapiSession = null
-        nnapiAttempted = false
-        nnapiSupportedCached = null
-        nnapiOutputName = null
-        nnapiBatchCap = null
-        nnapiInputWidth = null
-        nnapiInputHeight = null
+    fun resetVisualSessionsForSettingsChange() {
+        // Close sessions so new SessionOptions (e.g., CPU threading) take effect.
+        runCatching { indexingJob?.cancel() }
+
+        synchronized(cpuSessionLock) {
+            runCatching { cpuSession?.close() }
+            cpuSession = null
+        }
+        cpuOutputName = null
+        cpuBatchCap = null
+        cpuInputWidth = null
+        cpuInputHeight = null
     }
 
     fun cancelIndexing(): Job? {
@@ -1338,12 +1001,12 @@ class ORTImageViewModel(application: Application) : AndroidViewModel(application
         return job
     }
 
-        suspend fun getEmbeddingForImageId(id: Long): FloatArray? {
-            val idx = idxList.indexOf(id)
-            if (idx >= 0 && idx < embeddingsList.size) return embeddingsList[idx]
-            val record = withContext(Dispatchers.IO) { repository.getRecord(id) }
-            return record?.embedding
-        }
+    suspend fun getEmbeddingForImageId(id: Long): FloatArray? {
+        val idx = idxList.indexOf(id)
+        if (idx >= 0 && idx < embeddingsList.size) return embeddingsList[idx]
+        val record = withContext(Dispatchers.IO) { repository.getRecord(id) }
+        return record?.embedding
+    }
 
     fun removeFromIndex(ids: List<Long>) {
         if (ids.isEmpty()) return

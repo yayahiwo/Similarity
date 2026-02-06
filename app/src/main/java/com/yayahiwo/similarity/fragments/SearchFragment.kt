@@ -1416,39 +1416,6 @@ class SearchFragment : Fragment() {
                     }
                 }
 
-                val qnnAvailable = mORTImageViewModel.isQnnSupported()
-                val nnapiAvailable = mORTImageViewModel.isNnapiSupported()
-                val useQnnCheckbox = CheckBox(requireContext()).apply {
-                    text = if (qnnAvailable) {
-                        "Use Qualcomm QNN (Hexagon) acceleration (experimental)"
-                    } else {
-                        "Use Qualcomm QNN (Hexagon) acceleration (not available)"
-                    }
-                    isEnabled = qnnAvailable
-                    isChecked = qnnAvailable && prefs.getBoolean(SimilaritySettings.KEY_INDEX_USE_QNN, false)
-                }
-                val useNnapiCheckbox = CheckBox(requireContext()).apply {
-                    text = if (nnapiAvailable) {
-                        "Use Android NNAPI acceleration (experimental)"
-                    } else {
-                        "Use Android NNAPI acceleration (not available)"
-                    }
-                    isEnabled = nnapiAvailable
-                    isChecked = nnapiAvailable && prefs.getBoolean(SimilaritySettings.KEY_INDEX_USE_NNAPI, false)
-                }
-                useQnnCheckbox.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) useNnapiCheckbox.isChecked = false
-                }
-                useNnapiCheckbox.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) useQnnCheckbox.isChecked = false
-                }
-                val optionsView = LinearLayout(requireContext()).apply {
-                    orientation = LinearLayout.VERTICAL
-                    setPadding(48, 16, 48, 0)
-                    addView(useQnnCheckbox)
-                    addView(useNnapiCheckbox)
-                }
-
                 val dialog = MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Folders to index")
                     .setMultiChoiceItems(items.toTypedArray(), checked) { _, which, isChecked ->
@@ -1462,17 +1429,11 @@ class SearchFragment : Fragment() {
                             if (isChecked) checked[0] = false
                         }
                     }
-                    .setView(optionsView)
                     .setPositiveButton("OK") { _, _ ->
                         val selected = buckets
                             .filterIndexed { idx, _ -> checked[idx + 1] }
                             .map { it.first.toString() }
                             .toSet()
-
-                        prefs.edit()
-                            .putBoolean(SimilaritySettings.KEY_INDEX_USE_QNN, useQnnCheckbox.isChecked)
-                            .putBoolean(SimilaritySettings.KEY_INDEX_USE_NNAPI, useNnapiCheckbox.isChecked)
-                            .apply()
 
                         if (!checked[0] && selected.isEmpty()) {
                             Toast.makeText(
@@ -1534,7 +1495,7 @@ class SearchFragment : Fragment() {
                         val buttonsHeight =
                             (dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.parent as? View)?.height
                                 ?: 0
-                        val reserved = optionsView.height + buttonsHeight + dpToPx(140)
+                        val reserved = buttonsHeight + dpToPx(140)
                         val maxListHeight = (contentHeightLimit - reserved).coerceAtLeast(dpToPx(220))
 
                         if (listView.height > maxListHeight) {
@@ -1726,7 +1687,6 @@ class SearchFragment : Fragment() {
                                     .remove(SimilaritySettings.KEY_IMAGE_EMBEDDING_ENGINE_ID)
                                     .remove(SimilaritySettings.KEY_INDEX_FOLDERS_CONFIGURED)
                                     .remove(SimilaritySettings.KEY_INDEXED_BUCKET_IDS)
-                                    .remove(SimilaritySettings.KEY_QNN_SKIP_INT8_VISION_MODEL)
                                     .remove(SimilaritySettings.KEY_SELECT_FOLDER_HINT_SHOWN)
                                     .apply()
 

@@ -13,13 +13,12 @@ Prereqs: Android Studio + Android SDK, and Java 17 (required by the Android Grad
 - `./gradlew assembleDebug`: build a debug APK.
 - `./gradlew installDebug`: install debug build to a connected device/emulator.
 - `./gradlew assembleRelease`: build a release APK (signing not configured by default).
-- `./gradlew assembleDebug -PuseQnn=true`: build with the ONNX Runtime QNN (Qualcomm Hexagon/HTP) Execution Provider enabled.
 - `./gradlew lintDebug`: run Android Lint.
 - `./gradlew testDebugUnitTest`: run local (JVM) unit tests.
 - `./gradlew connectedDebugAndroidTest`: run instrumentation tests on a device/emulator.
 
 Tip: `local.properties` is machine-specific (Android SDK path). Don’t commit it.
-Tip: for Android Studio builds, set `useQnn=true` in `~/.gradle/gradle.properties` (or remove it to go back to CPU).
+Tip: for Android Studio builds, use Java 17+ (AGP requirement).
 
 ## Coding Style & Naming Conventions
 - Indentation: 4 spaces; follow Android Studio’s default Kotlin style.

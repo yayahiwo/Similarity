@@ -21,5 +21,5 @@
 #-renamesourcefileattribute SourceFile
 
 # ONNX Runtime is used for inference. Keep its public API to avoid issues with reflection and
-# provider initialization in optimized builds (especially QNN-enabled builds).
+# provider initialization in optimized builds.
 -keep class ai.onnxruntime.** { *; }

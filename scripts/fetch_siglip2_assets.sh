@@ -17,7 +17,7 @@ MODE="${1:-float}"
 if [[ "$MODE" != "float" && "$MODE" != "int8" && "$MODE" != "both" ]]; then
   echo "Usage: $0 [float|int8|both]"
   echo "  float: downloads CPU-friendly float models (default)"
-  echo "  int8 : downloads INT8 models (often requires QNN execution provider)"
+  echo "  int8 : downloads INT8 models (may require hardware acceleration)"
   echo "  both : downloads both float and INT8 models"
   exit 2
 fi
