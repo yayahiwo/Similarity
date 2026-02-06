@@ -3,7 +3,7 @@
 <p>I needed Similarity to do a little bit more than the original app to help me organize and clean my big photo collection, and with the help of AI I was able to add the following functionality:</p>
 
 <ul>
-<li> Indexing speed optimization, Now indexes about 50 images per second (CPU only) on a Qualcomm Snapdragon 8 Gen 2. equivilant to 3000 images per minute</li>
+<li> Indexing speed optimization, Now indexes about 50 images per second (CPU only) on a Qualcomm Snapdragon 8 Gen 2. equivilant to 3000 images per minute.</li>
 <li> Added image-to-image similarity threshold control slider.</li>
 <li> Added multi-select in the grid.</li>
 <li> Bulk Delete, Move, Share.</li>
