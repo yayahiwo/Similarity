@@ -106,3 +106,11 @@ dependencies {
     implementation 'com.microsoft.onnxruntime:onnxruntime-android:1.23.2'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 }
+
+// Android Gradle Plugin doesn't expose the Java plugin's `testClasses` task.
+// Provide a small compatibility alias for CI/scripts that expect it.
+if (tasks.findByName("testClasses") == null) {
+    tasks.register("testClasses") {
+        dependsOn("testDebugUnitTest")
+    }
+}
