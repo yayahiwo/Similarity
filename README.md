@@ -36,3 +36,67 @@
 <div style="display:flex;">
 <img alt="Text-to-Image Search" src="/res/Similarity_V0.8.4.jpg" width="100%">
 </div>
+
+---
+
+## Build prerequisites
+- Android Studio (recommended) or Android SDK command-line tools
+- Android SDK + NDK (required for the native `externalNativeBuild`/CMake code)
+- Java 17+ (Android Gradle Plugin requires Java 17)
+
+## Clone + submodules
+This repo uses git submodules under `third_party/` (required for native builds).
+
+```bash
+git submodule update --init --recursive
+```
+
+## Model assets
+The app expects SigLIP2 ONNX + tokenizer assets under `app/src/main/res/raw/`. They are intentionally excluded from git (see `.gitignore`) because they are large.
+
+Download them with:
+
+```bash
+./scripts/fetch_siglip2_assets.sh float
+```
+
+Options:
+- `float` (default): float models (CPU-friendly)
+- `int8`: INT8 models
+- `both`: downloads both
+
+## Build and install (USB device)
+If Gradle fails with a “requires Java 17” error, either set `JAVA_HOME` to a Java 17+ JDK, or (macOS + Android Studio) run Gradle using Android Studio’s bundled JDK:
+
+```bash
+./gradlew -Dorg.gradle.java.home="/Applications/Android Studio.app/Contents/jbr/Contents/Home" :app:assembleDebug
+```
+
+```bash
+./gradlew :app:assembleDebug
+./gradlew :app:installDebug
+```
+
+Verify the device is connected:
+```bash
+adb devices -l
+```
+
+## Build (Release)
+Release builds are shrinked/obfuscated (R8) and also require signing. For convenience, this project will sign `release` with the debug keystore unless you configure a release keystore.
+
+To configure a release keystore, copy `keystore.properties.example` → `keystore.properties` (not committed) or set env vars:
+- `SIMILARITY_KEYSTORE_PATH`
+- `SIMILARITY_KEYSTORE_PASSWORD`
+- `SIMILARITY_KEY_ALIAS`
+- `SIMILARITY_KEY_PASSWORD`
+
+```bash
+./gradlew :app:assembleRelease
+```
+
+## Tests / Lint
+```bash
+./gradlew :app:testDebugUnitTest
+./gradlew :app:lintDebug
+```
