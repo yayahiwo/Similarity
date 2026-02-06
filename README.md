@@ -39,34 +39,7 @@
 <img alt="Text-to-Image Search" src="/res/Similarity_V0.8.4.jpg" width="100%">
 </div>
 
----
 
-## Build prerequisites
-- Android Studio (recommended)
-- Android SDK + NDK (Android Studio can install these via SDK Manager)
-- Java 17+
-
-## Clone + submodules
-This repo uses git submodules under `third_party/` (required for native builds).
-
-```bash
-git submodule update --init --recursive
-```
-
-## Model assets
-The app expects the following ONNX model files in `app/src/main/res/raw/`:
-- `visual_quant.onnx`
-- `textual_quant.onnx`
-
-They are intentionally excluded from git (see `.gitignore`) because they are large.
-
-## Build and install (USB device)
-```bash
-./gradlew :app:assembleDebug
-./gradlew :app:installDebug
-```
-
-Verify the device is connected:
 ```bash
 adb devices -l
 ```
