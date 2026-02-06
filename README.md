@@ -32,14 +32,7 @@
 
 <p><b>Disclaimer 2</b>: This software is provided “AS IS”, without warranty of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, and noninfringement. Use of this app and its source code is at your own risk. The author(s) and contributor(s) are not responsible or liable for any damages, losses, data loss, device issues, security/ privacy incidents, or other harm arising from the use, misuse, or inability to use the software, including actions such as deleting, moving, or modifying files/photos. Always review permissions and keep backups of important data before use.</p>
 
-
-
 <h2>Screenshots of the UI</h2>
 <div style="display:flex;">
 <img alt="Text-to-Image Search" src="/res/Similarity_V0.8.4.jpg" width="100%">
 </div>
-
-
-```bash
-adb devices -l
-```
