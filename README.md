@@ -5,19 +5,18 @@
 <ul>
 <li> Added image-to-image similarity threshold control slider.</li>
 <li> Added multi-select in the grid (long-press to enter selection mode + checkboxes/overlay).</li>
-<li> Added bulk Delete for selected photos using Android’s system permission flow (MediaStore delete requests/recoverable permission).</li>
-<li> Added bulk Move for selected photos using folder picker + write permission (updates RELATIVE_PATH; primary storage support).</li>
-<li> Added automatic index cleanup when photos are deleted (removes them from the Room CLIP index + in- memory lists).</li>
+<li> Bulk Delete.</li>
+<li> Bulk Move.</li>
+<li> Automatic index cleanup when photos are deleted.</li>
 <li> Added a persistent “folders to index” setting.</li>
 <li> Changed startup so the app doesn’t auto-index immediately; it waits for folder selection and a Start action (with auto-prompt on first run).</li>
 <li> Added indexing progress + indexed count display.</li>
-<li> Added re-index progress UI directly in the search screen after folder changes, and auto-refreshes the grid when indexing finishes.</li>
+<li> Added re-index progress UI and auto-refreshes the grid when indexing finishes.</li>
 <li> Added pinch-to-zoom for the thumbnails grid</li>
-<li> Made the grid remember its zoom level (persists the current column count across navigation).</li>
-<li> Fixed grid visuals: square thumbnails (no stretching) and uniform 2px spacing horizontally/vertically.</li>
+<li> Made the grid remember its zoom level.</li>
 <li> In image-to-image results, added dimensions under each thumbnail (e.g., 800x600) and only show them for those results.</li>
-<li> Added a Back button to return from image-to-image results to the full “all images” grid.</li>
-<li> Improved the single-image screen: shows file location, file size, and pixel dimensions under the image.</li>
+<li> Back button to return from image-to-image results to the full “all images” grid.</li>
+<li> Single-image screen: shows file location, file size, and image dimensions.</li>
 <li> Updated single-image UI controls: BACK button, Find Similar button, and added icons (search icon on Find Similar; close icon on BACK).</li>
 <li> Fixed dark mode readability in single-image screen (text uses theme colors) and made the image background black in dark theme.</li>
 <li> Enabled/configured pinch-to-zoom on the single image view (PhotoView scales).</li>
