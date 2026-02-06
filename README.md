@@ -3,30 +3,30 @@
 <p>I needed Similarity to do a little bit more than the original app to help me organize and clean my big photo collection, and with the help of AI I was able to add the following functionality:</p>
 
 <ul>
+<li> Indexing speed optimization, Now indexes about 50 images per second (CPU only) on a Qualcomm Snapdragon 8 Gen 2. equivilant to 3000 images per minute</li>
 <li> Added image-to-image similarity threshold control slider.</li>
-<li> Added multi-select in the grid (long-press to enter selection mode + checkboxes/overlay).</li>
-<li> Bulk Delete.</li>
-<li> Bulk Move.</li>
+<li> Added multi-select in the grid.</li>
+<li> Bulk Delete, Move, Share.</li>
 <li> Automatic index cleanup when photos are deleted.</li>
 <li> Added a persistent “folders to index” setting.</li>
-<li> Changed startup so the app doesn’t auto-index immediately; it waits for folder selection and a Start action (with auto-prompt on first run).</li>
+<li> Changed startup so the app doesn’t auto-index but waits for folder selection.</li>
 <li> Added indexing progress + indexed count display.</li>
 <li> Added re-index progress UI and auto-refreshes the grid when indexing finishes.</li>
 <li> Added pinch-to-zoom for the thumbnails grid</li>
 <li> Made the grid remember its zoom level.</li>
-<li> In image-to-image results, added dimensions under each thumbnail (e.g., 800x600) and only show them for those results.</li>
+<li> In image-to-image results, added dimensions under each thumbnail can betoggled on/off from settings.</li>
 <li> Back button to return from image-to-image results to the full “all images” grid.</li>
 <li> Single-image screen: shows file location, file size, and image dimensions.</li>
-<li> Updated single-image UI controls: BACK button, Find Similar button, and added icons (search icon on Find Similar; close icon on BACK).</li>
-<li> Fixed dark mode readability in single-image screen (text uses theme colors) and made the image background black in dark theme.</li>
-<li> Enabled/configured pinch-to-zoom on the single image view (PhotoView scales).</li>
-<li> Adjusted single-image navigation so swipe-to-next/previous is handled via PhotoView’s fling callback (and doesn’t break pinch zoom).</li>
-<li> Converted the top-row search screen buttons to icon-only buttons (Search, Back, Clear, Folders) with appropriate icons.</li>
-<li> Updated Gradle config so the project builds with AGP’s Java 17+ requirement (points Gradle to Android Studio’s bundled JDK).</li>
-<li> Added Find near-duplicates tool.</li>
-<li> Added library Stats display.</li> 
+<li> Adjusted single-image navigation so swipe-to-next/previous.</li>
+<li> Find near-duplicates tool.</li>
+<li> Library Stats display.</li>
+<li> Added Lossless JPEG rotation</li>
+<li> Added Reset index to delete on-device embedding database</li>
+<li> Added stats screen (statistics of images count, size on desk etc)</li>
+<li> Added Backup and Restore database option</li>
+<li> Added manual metadata scan</li>
+<li> Added settings for Show similarity slider, CPU micro-batch size, use size filtering</li>
 </ul>
-
 
 <p><b>Disclaimer 1</b>: I am not a java developer and can't even understand most of the code in this repository, and also very new to git, I just want to put this here if it's useful to anyone.</p>
 
